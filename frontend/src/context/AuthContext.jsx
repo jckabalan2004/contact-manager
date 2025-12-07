@@ -2,7 +2,7 @@ import { createContext, useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const navigate = useNavigate();
 
-  // Run only ONCE on load
   useEffect(() => {
     checkAuth();
   }, []);
@@ -19,11 +18,7 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     try {
       const res = await api("/auth/me");
-      if (res.user) {
-        setUser(res.user);
-      } else {
-        setUser(null);
-      }
+      setUser(res.user || null);
     } catch {
       setUser(null);
     } finally {
