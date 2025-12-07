@@ -14,37 +14,27 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://contact-manager-t1ta.vercel.app"
+  "https://contact-manager-t1ta.vercel.app",
+  "https://contact-manager-production-000d.up.railway.app"
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow server-to-server, Postman, curl
-      if (!origin) return callback(null, true);
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
 
-      // Allow Vercel automatically
-      if (origin.endsWith(".vercel.app")) {
-        return callback(null, true);
-      }
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith(".vercel.app")
+    ) {
+      return callback(null, true);
+    }
 
-      // Allow from whitelist
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
+    console.log("CORS BLOCKED:", origin);
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+}));
 
-      console.log("CORS BLOCKED:", origin);
-      return callback(null, false); // <- Don't throw error (avoids server crash)
-    },
-    credentials: true,
-  })
-);
-
-// Allow OPTIONS preflight for all routes
-app.options("*", cors());
-
-
-// IMPORTANT for preflight requests
 app.options("*", cors());
 
 // ---------------------------------------
