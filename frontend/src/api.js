@@ -16,6 +16,10 @@ const getBaseURL = () => {
 
 const BASE_URL = getBaseURL();
 
+function trimSlash(s = "") {
+  return s.endsWith("/") ? s.slice(0, -1) : s;
+}
+
 export async function api(endpoint, options = {}) {
   const config = {
     method: options.method || "GET",
@@ -27,14 +31,24 @@ export async function api(endpoint, options = {}) {
     body: options.body || null,
   };
 
-  // Ensure endpoint starts with /api for non-localhost environments
-  const path = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
-    ? endpoint 
-    : `/api${endpoint}`;
-  
-  const url = BASE_URL + path;
+  const endpointNormalized = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const base = trimSlash(BASE_URL);
+
+  let url;
+  if (base === "/api") {
+    // local dev proxy
+    url = endpointNormalized;
+  } else {
+    // production backend: make sure we don't double-prefix /api
+    if (endpointNormalized.startsWith("/api")) {
+      url = `${base}${endpointNormalized}`;
+    } else {
+      url = `${base}/api${endpointNormalized}`;
+    }
+  }
+
   console.log("[API]", config.method, url);
-  
+
   const response = await fetch(url, config);
 
   let data;
