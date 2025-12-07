@@ -171,39 +171,28 @@ const refreshToken = async (req, res) => {
 
 const me = async (req, res) => {
   try {
-    const token = req.cookies.accessToken;
+    // verifyToken middleware already validated and set req.userId
+    const userId = req.userId;
     
-    console.log("Me endpoint - Cookies:", req.cookies); // Debug
-    console.log("Me endpoint - Token exists:", !!token);
-    
-    if (!token) {
-      console.log("No access token found");
+    if (!userId) {
       return res.status(401).json({ 
         success: false,
         message: "Not authenticated" 
       });
     }
 
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-    console.log("Token decoded for user:", decoded.userId);
-
     // Get user from database
     const user = await query(
       "SELECT id, name, email FROM users WHERE id = $1",
-      [decoded.userId]
+      [userId]
     );
 
     if (!user.rows.length) {
-      console.log("User not found in DB:", decoded.userId);
-      clearTokenCookies(res);
       return res.status(401).json({ 
         success: false,
         message: "User not found" 
       });
     }
-
-    console.log("User found:", user.rows[0].email);
     
     return res.status(200).json({ 
       success: true,
@@ -213,22 +202,6 @@ const me = async (req, res) => {
   } catch (err) {
     console.error("Me endpoint error:", err.message);
     
-    clearTokenCookies(res);
-
-    if (err.name === 'JsonWebTokenError') {
-      return res.status(401).json({ 
-        success: false,
-        message: "Invalid token" 
-      });
-    }
-
-    if (err.name === 'TokenExpiredError') {
-      return res.status(401).json({ 
-        success: false,
-        message: "Token expired" 
-      });
-    }
-
     return res.status(500).json({ 
       success: false,
       message: "Server error" 

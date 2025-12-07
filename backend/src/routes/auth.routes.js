@@ -10,7 +10,7 @@ const { validateRegister, validateLogin, validate } = require("../middleware/val
 router.post("/register", validateRegister, validate, authController.register);
 router.post("/login", validateLogin, validate, authController.login);
 router.post("/logout", authController.logout);
-router.get("/me", authController.me); // No extra CORS needed
+router.get("/me", verifyToken, authController.me); // Protected route
 router.post("/refresh-token", authController.refreshToken);
 
 module.exports = router;
