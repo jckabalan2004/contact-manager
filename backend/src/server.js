@@ -20,16 +20,22 @@ app.use(
 );
 
 // ---- FIXED CORS ----
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://contact-manager-t1ta.vercel.app",
-  "https://contact-manager-production-000d.up.railway.app"
-];
-
 app.use(cors({
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // Allow Postman, server-side, etc.
+
+    const allowed =
+      origin.startsWith("http://localhost") ||
+      origin.endsWith(".vercel.app"); // allow ALL Vercel preview or prod URLs
+
+    if (allowed) return callback(null, true);
+
+    console.log("CORS BLOCKED:", origin);
+    return callback(new Error("CORS Not Allowed"));
+  },
   credentials: true,
 }));
+
 
 app.use(cookieParser());
 app.use(express.json());
