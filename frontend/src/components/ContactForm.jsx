@@ -119,4 +119,4 @@ const ContactForm = ({ contact, onClose, onSuccess }) => {
   );
 };
 
-expo
+export default ContactForm;
