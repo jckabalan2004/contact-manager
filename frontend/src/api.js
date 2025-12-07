@@ -39,8 +39,10 @@ export async function api(endpoint, options = {}) {
     // local dev proxy
     url = endpointNormalized;
   } else {
-    // production backend: make sure we don't double-prefix /api
-    if (endpointNormalized.startsWith("/api")) {
+    // production backend: handle cases where base already contains /api
+    if (base.endsWith("/api")) {
+      url = `${base}${endpointNormalized}`;
+    } else if (endpointNormalized.startsWith("/api")) {
       url = `${base}${endpointNormalized}`;
     } else {
       url = `${base}/api${endpointNormalized}`;
