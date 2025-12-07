@@ -8,63 +8,67 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const navigate = useNavigate();
 
+  // Run only ONCE on load
   useEffect(() => {
     checkAuth();
   }, []);
 
   const checkAuth = async () => {
     try {
-      const data = await api("/auth/me");
-      setUser(data.user);
+      const res = await api("/auth/me");
+      if (res.user) {
+        setUser(res.user);
+      } else {
+        setUser(null);
+      }
     } catch {
       setUser(null);
     } finally {
-      setLoading(false);
-    }
-  };
-
-  const register = async (userData) => {
-    try {
-      const data = await api("/auth/register", {
-        method: "POST",
-        body: JSON.stringify(userData),
-      });
-      setUser(data.user);
-      navigate("/dashboard");
-      return { success: true };
-    } catch (error) {
-      return { success: false, message: error.message };
+      setCheckingAuth(false);
     }
   };
 
   const login = async (credentials) => {
     try {
-      const data = await api("/auth/login", {
+      const res = await api("/auth/login", {
         method: "POST",
         body: JSON.stringify(credentials),
       });
-      setUser(data.user);
+      setUser(res.user);
       navigate("/dashboard");
-      return { success: true };
-    } catch (error) {
-      return { success: false, message: error.message };
+    } catch (err) {
+      return { success: false, message: err.message };
     }
+    return { success: true };
+  };
+
+  const register = async (data) => {
+    try {
+      const res = await api("/auth/register", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      setUser(res.user);
+      navigate("/dashboard");
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+    return { success: true };
   };
 
   const logout = async () => {
     try {
       await api("/auth/logout", { method: "POST" });
-    } finally {
-      setUser(null);
-      navigate("/login");
-    }
+    } catch {}
+    setUser(null);
+    navigate("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout, checkingAuth }}>
       {children}
     </AuthContext.Provider>
   );
