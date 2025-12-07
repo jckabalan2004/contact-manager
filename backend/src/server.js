@@ -11,41 +11,38 @@ const { verifyToken } = require('./middleware/auth.middleware.js');
 
 const app = express();
 
-// ---------------------------------------
-// HELMET (CSP disabled because API only)
-// ---------------------------------------
-app.use(
-  helmet({
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false,
-  })
-);
 
-// ---------------------------------------
-// CORS (Fully fixed for Vercel + Localhost)
-// ---------------------------------------
 const allowedOrigins = [
   "http://localhost:5173",
   "https://contact-manager-t1ta.vercel.app"
 ];
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // Postman/cURL
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow server-to-server, Postman, curl
+      if (!origin) return callback(null, true);
 
-    if (
-      allowedOrigins.includes(origin) ||
-      origin.endsWith(".vercel.app") ||
-      origin.startsWith("http://localhost")
-    ) {
-      return callback(null, true);
-    }
+      // Allow Vercel automatically
+      if (origin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      }
 
-    console.log("CORS BLOCKED:", origin);
-    return callback(null, false); // don't throw error
-  },
-  credentials: true,
-}));
+      // Allow from whitelist
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      console.log("CORS BLOCKED:", origin);
+      return callback(null, false); // <- Don't throw error (avoids server crash)
+    },
+    credentials: true,
+  })
+);
+
+// Allow OPTIONS preflight for all routes
+app.options("*", cors());
+
 
 // IMPORTANT for preflight requests
 app.options("*", cors());
