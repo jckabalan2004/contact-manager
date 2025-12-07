@@ -1,25 +1,15 @@
-import { createContext, useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { createContext, useState, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { api } from "../api";
 
 const AuthContext = createContext(null);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
-  // Configure axios defaults
-  axios.defaults.withCredentials = true;
-  axios.defaults.baseURL = '/api';
 
   useEffect(() => {
     checkAuth();
@@ -27,9 +17,9 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     try {
-      const response = await axios.get('/auth/me');
-      setUser(response.data.user);
-    } catch (error) {
+      const data = await api("/auth/me");
+      setUser(data.user);
+    } catch {
       setUser(null);
     } finally {
       setLoading(false);
@@ -38,52 +28,43 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('/auth/register', userData);
-      setUser(response.data.user);
-      navigate('/dashboard');
+      const data = await api("/auth/register", {
+        method: "POST",
+        body: JSON.stringify(userData),
+      });
+      setUser(data.user);
+      navigate("/dashboard");
       return { success: true };
     } catch (error) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Registration failed'
-      };
+      return { success: false, message: error.message };
     }
   };
 
   const login = async (credentials) => {
     try {
-      const response = await axios.post('/auth/login', credentials);
-      setUser(response.data.user);
-      navigate('/dashboard');
+      const data = await api("/auth/login", {
+        method: "POST",
+        body: JSON.stringify(credentials),
+      });
+      setUser(data.user);
+      navigate("/dashboard");
       return { success: true };
     } catch (error) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Login failed'
-      };
+      return { success: false, message: error.message };
     }
   };
 
   const logout = async () => {
     try {
-      await axios.post('/auth/logout');
+      await api("/auth/logout", { method: "POST" });
+    } finally {
       setUser(null);
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
+      navigate("/login");
     }
   };
 
-  const value = {
-    user,
-    loading,
-    register,
-    login,
-    logout
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
