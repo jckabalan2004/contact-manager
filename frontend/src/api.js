@@ -1,4 +1,20 @@
-const BASE_URL = import.meta.env.VITE_API_URL;
+// Use environment variable if set, otherwise fall back to /api (local dev proxy) or full production URL
+const getBaseURL = () => {
+  // In production, use the full backend URL from env
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // In local dev, use the proxy path
+  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    return "/api";
+  }
+  
+  // In production without env var, use the Railway backend URL (without /api suffix, will be added by endpoint)
+  return "https://contact-manager-production-a16a.up.railway.app";
+};
+
+const BASE_URL = getBaseURL();
 
 export async function api(endpoint, options = {}) {
   const config = {
@@ -11,7 +27,15 @@ export async function api(endpoint, options = {}) {
     body: options.body || null,
   };
 
-  const response = await fetch(BASE_URL + endpoint, config);
+  // Ensure endpoint starts with /api for non-localhost environments
+  const path = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
+    ? endpoint 
+    : `/api${endpoint}`;
+  
+  const url = BASE_URL + path;
+  console.log("[API]", config.method, url);
+  
+  const response = await fetch(url, config);
 
   let data;
   try {
