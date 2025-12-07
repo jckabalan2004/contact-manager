@@ -26,9 +26,13 @@ app.use(helmet({
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5175',
+  origin: [
+    "http://localhost:5173",
+    "contact-manager-production-000d.up.railway.app"
+  ],
   credentials: true,
 }));
+
 
 app.use(cookieParser());
 app.use(express.json());
