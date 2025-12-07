@@ -11,13 +11,11 @@ const { verifyToken } = require('./middleware/auth.middleware.js');
 
 const app = express();
 
-
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
       "http://localhost:5173",
-      "https://cool-praline-06fb97.netlify.app", // NETLIFY FRONTEND
-      "https://contact-manager-production-000d.up.railway.app" // YOUR BACKEND
+      "https://cool-praline-06fb97.netlify.app"
     ];
 
     if (!origin || allowedOrigins.includes(origin)) {
@@ -25,11 +23,13 @@ app.use(cors({
     }
 
     console.log("❌ CORS BLOCKED:", origin);
-    return callback(new Error("CORS Not Allowed"));
+    return callback(new Error("CORS Not Allowed"), false);
   },
   credentials: true,
+  optionsSuccessStatus: 200,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['Set-Cookie', 'Authorization']
 }));
-
 
 app.options("*", cors());
 

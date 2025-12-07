@@ -1,28 +1,45 @@
 const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
-  const token =
-    req.cookies?.accessToken ||
-    req.header('Authorization')?.replace('Bearer ', '');
+  // Allow preflight OPTIONS requests to pass through
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
 
+  const token = req.cookies?.accessToken;
+  
+  console.log("Auth Middleware - Token:", !!token); // Debug
+  
   if (!token) {
-    return res.status(401).json({ message: 'Not authenticated' });
+    console.log("Auth Middleware - No token found");
+    return res.status(401).json({ 
+      success: false,
+      message: 'Not authenticated' 
+    });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-
-    // IMPORTANT → this must match generateTokens({ userId })
     req.userId = decoded.userId;
-
+    console.log("Auth Middleware - User ID:", decoded.userId);
     next();
   } catch (err) {
-    console.error('Auth error:', err);
-    return res.status(401).json({ message: 'Invalid or expired token' });
+    console.error('Auth error:', err.message);
+    
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ 
+        success: false,
+        message: 'Token expired' 
+      });
+    }
+    
+    return res.status(401).json({ 
+      success: false,
+      message: 'Invalid token' 
+    });
   }
 };
 
-// Export as named verifyToken to match imports across the codebase
 module.exports = {
   verifyToken: authMiddleware,
 };
