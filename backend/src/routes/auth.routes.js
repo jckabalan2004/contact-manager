@@ -7,8 +7,11 @@ const { validateRegister, validateLogin, validate } = require("../middleware/val
 router.post("/register", validateRegister, validate, authController.register);
 router.post("/login", validateLogin, validate, authController.login);
 router.post("/logout", authController.logout);
-router.post("/refresh-token", authController.refreshToken);
 
-//router.get("/me", verifyToken, authController.getMe);
+// must be GET and must not be commented
+router.get("/me", authController.me);
+
+// optional refresh token
+router.post("/refresh-token", authController.refreshToken);
 
 module.exports = router;
