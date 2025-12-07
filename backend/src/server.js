@@ -12,28 +12,24 @@ const { verifyToken } = require('./middleware/auth.middleware.js');
 const app = express();
 
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://cool-praline-06fb97.netlify.app/",
-  "https://contact-manager-production-000d.up.railway.app"
-];
-
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "https://cool-praline-06fb97.netlify.app", // NETLIFY FRONTEND
+      "https://contact-manager-production-000d.up.railway.app" // YOUR BACKEND
+    ];
 
-    if (
-      allowedOrigins.includes(origin) ||
-      origin.endsWith(".vercel.app")
-    ) {
+    if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
-    console.log("CORS BLOCKED:", origin);
-    return callback(new Error("Not allowed by CORS"));
+    console.log("❌ CORS BLOCKED:", origin);
+    return callback(new Error("CORS Not Allowed"));
   },
   credentials: true,
 }));
+
 
 app.options("*", cors());
 
