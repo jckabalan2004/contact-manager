@@ -13,28 +13,14 @@ const app = express();
 
 // CORS middleware - must be before routes
 app.use(cors({
-  origin: function(origin, callback) {
-    const allowedOrigins = [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "http://localhost:5175",
-      "https://cool-praline-06fb97.netlify.app"
-    ];
-
-    // Allow requests with no origin (like mobile apps or Postman)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log("⚠️ CORS request from:", origin);
-      callback(null, true); // Allow all origins to test
-    }
-  },
+  origin: [
+    "http://localhost:5173",
+    "https://cool-praline-06fb97.netlify.app",
+    "https://contact-manager-production-a16a.up.railway.app"
+  ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-  exposedHeaders: ['Set-Cookie', 'Authorization'],
-  maxAge: 86400
 }));
+
 
 // Explicit OPTIONS handler for preflight
 app.options('*', cors());
