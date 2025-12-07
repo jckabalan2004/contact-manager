@@ -14,7 +14,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://contact-manager-t1ta.vercel.app",
+  "https://cool-praline-06fb97.netlify.app/",
   "https://contact-manager-production-000d.up.railway.app"
 ];
 
