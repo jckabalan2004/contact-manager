@@ -11,27 +11,33 @@ const { verifyToken } = require('./middleware/auth.middleware.js');
 
 const app = express();
 
+// CORS middleware - must be before routes
 app.use(cors({
-  origin: (origin, callback) => {
+  origin: function(origin, callback) {
     const allowedOrigins = [
       "http://localhost:5173",
+      "http://localhost:5174",
+      "http://localhost:5175",
       "https://cool-praline-06fb97.netlify.app"
     ];
 
+    // Allow requests with no origin (like mobile apps or Postman)
     if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
+      callback(null, true);
+    } else {
+      console.log("⚠️ CORS request from:", origin);
+      callback(null, true); // Allow all origins to test
     }
-
-    console.log("❌ CORS BLOCKED:", origin);
-    return callback(new Error("CORS Not Allowed"), false);
   },
   credentials: true,
-  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-  exposedHeaders: ['Set-Cookie', 'Authorization']
+  exposedHeaders: ['Set-Cookie', 'Authorization'],
+  maxAge: 86400
 }));
 
-app.options("*", cors());
+// Explicit OPTIONS handler for preflight
+app.options('*', cors());
 
 // ---------------------------------------
 app.use(cookieParser());
