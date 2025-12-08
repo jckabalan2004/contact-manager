@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import ContactList from "../components/ContactList";
-import { ContactForm } from "../components/ContactForm";
+import ContactForm from "../components/ContactForm";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
