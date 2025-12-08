@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { api } from "../api";
 
-const ContactList = ({ onEdit, onSuccess }) => {
+const ContactList = ({ onEdit, onSuccess, refresh }) => {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     fetchContacts();
-  }, []);
+  }, [refresh]);  
 
   const fetchContacts = async () => {
     try {

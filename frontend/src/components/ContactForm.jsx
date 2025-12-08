@@ -8,16 +8,12 @@ const handleSubmit = async (e) => {
     if (contact) {
       await api(`/contacts/${contact.id}`, {
         method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
       onSuccess("Contact updated successfully");
     } else {
       await api("/contacts", {
         method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
       onSuccess("Contact created successfully");

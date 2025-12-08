@@ -7,11 +7,13 @@ export async function api(endpoint, options = {}) {
       "Content-Type": "application/json",
       ...(options.headers || {}),
     },
-    credentials: "include",
+    credentials: "include", // always include cookies
     body: options.body || null,
   };
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, config);
+  const url = `${BASE_URL}${endpoint}`;
+
+  const response = await fetch(url, config);
 
   let data;
   try {
