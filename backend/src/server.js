@@ -10,6 +10,7 @@ const contactRoutes = require('./routes/contacts.routes.js');
 const { verifyToken } = require('./middleware/auth.middleware.js');
 
 const app = express();
+app.set("trust proxy", 1);
 
 // CORS middleware - must be before routes
 app.use(cors({
