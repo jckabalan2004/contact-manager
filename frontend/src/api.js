@@ -1,26 +1,22 @@
-const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE = import.meta.env.VITE_API_URL.replace(/\/$/, ""); 
 
 export async function api(endpoint, options = {}) {
-  const config = {
+  endpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+
+  const response = await fetch(`${BASE}${endpoint}`, {
     method: options.method || "GET",
     headers: {
       "Content-Type": "application/json",
       ...(options.headers || {}),
     },
-    credentials: "include", // always include cookies
+    credentials: "include",
     body: options.body || null,
-  };
+  });
 
-  const url = `${BASE_URL}${endpoint}`;
-
-  const response = await fetch(url, config);
-
-  let data;
+  let data = {};
   try {
     data = await response.json();
-  } catch {
-    data = {};
-  }
+  } catch {}
 
   if (!response.ok) {
     throw new Error(data.message || "Request failed");
