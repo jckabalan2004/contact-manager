@@ -1,4 +1,4 @@
-const { query } = require('../config/db');
+const { query } = require('../db');
 
 const getAllContacts = async (req, res) => {
   try {
