@@ -98,7 +98,7 @@ const ContactForm = ({ contact, onClose, onSuccess }) => {
 
           <input
             name="phone"
-            placeholder="Phone"
+            placeholder="Phone (e.g. 9123456789)"
             value={formData.phone}
             onChange={handleChange}
             className="w-full border px-3 py-2"
