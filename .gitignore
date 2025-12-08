@@ -1,0 +1,20 @@
+# Node
+node_modules/
+
+# env
+.env
+.env.local
+
+# OS
+.DS_Store
+
+# Logs
+npm-debug.log*
+.yarn-debug.log*
+.yarn-error.log*
+
+# Vite
+dist/
+
+# Lockfiles (keep package-lock.json for deterministic installs)
+# package-lock.json

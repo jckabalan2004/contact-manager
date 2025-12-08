@@ -14,11 +14,10 @@ const app = express();
 // CORS middleware - must be before routes
 app.use(cors({
   origin: [
-    "http://localhost:5173",
-    "https://cool-praline-06fb97.netlify.app",
-    "https://contact-manager-production-a16a.up.railway.app"
-  ],
-  credentials: true,
+  "http://localhost:5173",
+  "https://exemplary-flexibility-production.up.railway.app"
+],
+credentials: true
 }));
 
 
