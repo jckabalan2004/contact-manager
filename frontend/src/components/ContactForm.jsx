@@ -26,3 +26,4 @@ const handleSubmit = async (e) => {
     setLoading(false);
   }
 };
+export default ContactForm;
